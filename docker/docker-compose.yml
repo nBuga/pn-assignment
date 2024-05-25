@@ -1,0 +1,30 @@
+services:
+
+# Database localhost
+  mysql:
+    build: ./image_setup/mysql
+    hostname: plan-net.mysql
+    container_name: plan-net.mysql
+    image: mysql
+    expose:
+      - 3306
+    ports:
+      - '${APPLICATION_IP}:33063:3306'
+    environment:
+      - MYSQL_ROOT_HOST=${MYSQL_ROOT_HOST}
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - MYSQL_DATABASE=${MYSQL_DATABASE}
+
+# plan-net project
+  plan-net:
+      build: image_setup/plan-net
+      hostname: local.plan-net.ro
+      container_name: plan-net
+      image: plan-net
+      links:
+        - mysql
+      volumes:
+        - '${LOCAL_APPS_DIR}/:/var/www/plan-net:delegated'
+      ports:
+        - '${APPLICATION_IP}:80:80'
+        - '${APPLICATION_IP}:8888:8888'

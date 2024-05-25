@@ -1,0 +1,22 @@
+<VirtualHost *:80>
+  ServerName local.plan-net.ro
+
+  ## Vhost docroot
+  DocumentRoot "/var/www/plan-net/public"
+
+  ## Directories, there should at least be a declaration for /var/www/plan-net/web
+
+  <Directory "/var/www/plan-net/public">
+    AllowOverride All
+    Require all granted
+    Allow from All
+  </Directory>
+
+  ## Logging
+  ErrorLog "/var/log/apache2/docker.plan-net-non-ssl_error.log"
+  ServerSignature Off
+  CustomLog "/var/log/apache2/docker.plan-net-non-ssl_access.log" combined
+  ## Rewrite rules
+  RewriteEngine On
+
+</VirtualHost>
