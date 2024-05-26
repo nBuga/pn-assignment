@@ -32,6 +32,7 @@ Setup instructions for Docker environment
 7. RUN ``bin/console app:import-prizes en``
 7. RUN ``bin/console app:import-prizes de``
 8. RUN ``bin/console doctrine:fixtures:load``
+7. RUN ``bin/console messenger:consume async``
 - You can configure domain names by editing ``/etc/hosts`` on the host and putting the IP and domain names desired, such as:
 ##
 # Host Database

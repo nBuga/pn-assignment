@@ -21,6 +21,18 @@ class PrizeRepository extends ServiceEntityRepository
         parent::__construct($registry, Prize::class);
     }
 
+    public function countPrizesByLocale(string $locale): int
+    {
+        return $this->createQueryBuilder('p')
+            ->select('COUNT(p.id)')
+            //->from('App:Prize', 'p')
+            ->innerJoin('App\Entity\PrizeTranslation', 'pt', 'WITH', 'pt.translatable = p.id')
+            ->where('pt.locale = :locale')
+            ->setParameter('locale', $locale)
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
+
     //    /**
     //     * @return Prize[] Returns an array of Prize objects
     //     */
