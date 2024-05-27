@@ -30,13 +30,6 @@ class Prize implements TranslatableInterface
         return $this->id;
     }
 
-    public function setId(int $id): static
-    {
-        $this->id = $id;
-
-        return $this;
-    }
-
     public function getPartnerCode(): ?Partner
     {
         return $this->partnerCode;

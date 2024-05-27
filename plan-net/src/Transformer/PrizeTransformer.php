@@ -19,8 +19,8 @@ readonly class PrizeTransformer
     {
         $this->prize->setPartnerCode($partner);
         $this->prize->setCode($this->prizeDTO->code);
-        $this->prize->translate($this->locale)->setName($this->prizeDTO->name);
-        $this->prize->translate($this->locale)->setDescription($this->prizeDTO->description);
+        $this->prize->translate($this->locale, false)->setName($this->prizeDTO->name);
+        $this->prize->translate($this->locale, false)->setDescription($this->prizeDTO->description);
 
         return $this->prize;
     }

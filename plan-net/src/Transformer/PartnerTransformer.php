@@ -16,7 +16,7 @@ readonly class PartnerTransformer
 
     public function transform(): Partner
     {
-        $this->partner->translate($this->locale)->setName($this->partnerDTO->name);
+        $this->partner->translate($this->locale, false)->setName($this->partnerDTO->name);
         $this->partner->setUrl($this->partnerDTO->url);
         $this->partner->setCode($this->partnerDTO->code);
 

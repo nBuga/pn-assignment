@@ -39,11 +39,14 @@ class CampaignService
      * We encourage you to use a framework and recommend the following which we are currently using: Symfony, Phalcon.
      * We look at database design, code design, OOP principles applied and code formatting.
      *
+     * Authentication pe api (bearer, etc)
+     *
      */
 
     public CONST CAMPAIGN_AVAILABILITY_DAYS = 2;
     public CONST DATE_TIME_FORMAT = 'Y-m-d H:i:s';
 
+    public CONST START_CAMPAIGN_DATE = '2024-05-27 10:00:00';
     public CONST START_CAMPAIGN_TIME = '09:00:00';
     public CONST END_CAMPAIGN_TIME = '20:00:00';
 
@@ -65,17 +68,17 @@ class CampaignService
 
     /**
      * @param UserInterface $user
-     * @return bool
+     * @return Prize
      * @throws CampaignNotValidException
      */
-    public function play(UserInterface $user): bool
+    public function play(UserInterface $user): Prize
     {
         $this->validateIntervalHours();
         $this->validateUserAlreadyPlayed($user);
         $this->validateUserAlreadyWonToday($user);
         $this->validateTotalPrizeForToday();
 
-        return true;
+        return $this->getRandomPrize();
     }
 
     /**
@@ -85,9 +88,9 @@ class CampaignService
      */
     private function validateIntervalHours(): void
     {
-        $currentDate = new \DateTime('now', new \DateTimeZone(self::TIMEZONE));
-        $startingCampaignDay = $currentDate->format(self::DATE_TIME_FORMAT);
-        $endingCampaignDay = $currentDate->add(\DateInterval::createFromDateString(
+        $campaignDate = new \DateTime(self::START_CAMPAIGN_DATE, new \DateTimeZone(self::TIMEZONE));
+        $startingCampaignDay = $campaignDate->format(self::DATE_TIME_FORMAT);
+        $endingCampaignDay = $campaignDate->add(\DateInterval::createFromDateString(
             sprintf('%d day', self::CAMPAIGN_AVAILABILITY_DAYS))
         )->format(self::DATE_TIME_FORMAT);
 
@@ -98,6 +101,7 @@ class CampaignService
         $endTimeAvailable = new \DateTime('now', new \DateTimeZone(self::TIMEZONE));
         $endTimeAvailable = $endTimeAvailable->modify(self::END_CAMPAIGN_TIME)->format(self::DATE_TIME_FORMAT);
 
+        dd($startingCampaignDay, $endingCampaignDay, $startTimeAvailable, $endTimeAvailable);
         if ($startingCampaignDay > $startTimeAvailable && $startingCampaignDay < $endTimeAvailable) {
             return;
         }
@@ -135,7 +139,7 @@ class CampaignService
          *
          */
 
-        $numberOfPrizesWonToday = 500; // check in Redis
+        $numberOfPrizesWonToday = 400; // check in Redis
 
         if ($numberOfPrizesWonToday >= $this->totalNumberPrizes / self::CAMPAIGN_AVAILABILITY_DAYS) {
             throw new CampaignNotValidException(sprintf("All the %d prizes were played today! Came back tomorrow!", $numberOfPrizesWonToday));
