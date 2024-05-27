@@ -21,40 +21,20 @@ class PrizeRepository extends ServiceEntityRepository
         parent::__construct($registry, Prize::class);
     }
 
-    public function countPrizesByLocale(string $locale): int
+    public function countPrizes(): int
     {
         return $this->createQueryBuilder('p')
-            ->select('COUNT(p.id)')
-            //->from('App:Prize', 'p')
-            ->innerJoin('App\Entity\PrizeTranslation', 'pt', 'WITH', 'pt.translatable = p.id')
-            ->where('pt.locale = :locale')
-            ->setParameter('locale', $locale)
+            ->select('SUM(p.stock)')
+            ->where('p.stock > 0')
             ->getQuery()
             ->getSingleScalarResult();
     }
 
-    //    /**
-    //     * @return Prize[] Returns an array of Prize objects
-    //     */
-    //    public function findByExampleField($value): array
-    //    {
-    //        return $this->createQueryBuilder('p')
-    //            ->andWhere('p.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->orderBy('p.id', 'ASC')
-    //            ->setMaxResults(10)
-    //            ->getQuery()
-    //            ->getResult()
-    //        ;
-    //    }
-
-    //    public function findOneBySomeField($value): ?Prize
-    //    {
-    //        return $this->createQueryBuilder('p')
-    //            ->andWhere('p.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->getQuery()
-    //            ->getOneOrNullResult()
-    //        ;
-    //    }
+    public function getAvailablePrizes(): array
+    {
+        return $this->createQueryBuilder('p')
+            ->where('p.stock > 0')
+            ->getQuery()
+            ->getResult();
+    }
 }

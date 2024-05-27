@@ -5,8 +5,8 @@ namespace App\Service;
 use App\Entity\Prize;
 use App\Exception\CampaignNotValidException;
 use App\Repository\PrizeRepository;
+use Doctrine\DBAL\Exception;
 use Symfony\Component\Security\Core\User\UserInterface;
-use Symfony\Component\Translation\LocaleSwitcher;
 
 class CampaignService
 {
@@ -41,44 +41,46 @@ class CampaignService
      *
      * Authentication pe api (bearer, etc)
      *
+     * !!!!
+     * Daca nu mai exista premii disponibile, afisez mesaj eroare !!!
+     *
      */
 
     public CONST CAMPAIGN_AVAILABILITY_DAYS = 2;
-    public CONST DATE_TIME_FORMAT = 'Y-m-d H:i:s';
-
-    public CONST START_CAMPAIGN_DATE = '2024-05-27 10:00:00';
+    public CONST START_CAMPAIGN_DATE = '2024-05-27';
     public CONST START_CAMPAIGN_TIME = '09:00:00';
-    public CONST END_CAMPAIGN_TIME = '20:00:00';
-
+    public CONST END_CAMPAIGN_TIME = '24:00:00';
+    public CONST DATE_FORMAT = 'Y-m-d';
     public CONST TIMEZONE = 'Europe/Bucharest';
 
-    private int $totalNumberPrizes;
+    private int $totalNumberAvailablePrizes;
 
     public function __construct(
         private readonly PrizeRepository $prizeRepository,
-        private readonly LocaleSwitcher $localeSwitcher,
-    ) {
+        private readonly PrizeService $prizeService
+    ){
         $this->setTotalNumberOfPrizes();
     }
 
     private function setTotalNumberOfPrizes(): void
     {
-        $this->totalNumberPrizes = $this->prizeRepository->countPrizesByLocale($this->localeSwitcher->getLocale());
+        $this->totalNumberAvailablePrizes = $this->prizeRepository->countPrizes();
     }
 
     /**
      * @param UserInterface $user
      * @return Prize
      * @throws CampaignNotValidException
+     * @throws Exception
      */
     public function play(UserInterface $user): Prize
     {
-        $this->validateIntervalHours();
+        $this->validateDateTime();
         $this->validateUserAlreadyPlayed($user);
         $this->validateUserAlreadyWonToday($user);
         $this->validateTotalPrizeForToday();
 
-        return $this->getRandomPrize();
+        return $this->prizeService->saveUserPrize($user, $this->getRandomPrize());
     }
 
     /**
@@ -86,27 +88,36 @@ class CampaignService
      * @return void
      * @throws CampaignNotValidException
      */
-    private function validateIntervalHours(): void
+    private function validateDateTime(): void
     {
         $campaignDate = new \DateTime(self::START_CAMPAIGN_DATE, new \DateTimeZone(self::TIMEZONE));
-        $startingCampaignDay = $campaignDate->format(self::DATE_TIME_FORMAT);
+
+        $startingCampaignDay = $campaignDate->format(self::DATE_FORMAT);
+        $startingCampaignTimestamp = $campaignDate->getTimestamp();
         $endingCampaignDay = $campaignDate->add(\DateInterval::createFromDateString(
-            sprintf('%d day', self::CAMPAIGN_AVAILABILITY_DAYS))
-        )->format(self::DATE_TIME_FORMAT);
+            sprintf('%d day', self::CAMPAIGN_AVAILABILITY_DAYS - 1))
+        )->format(self::DATE_FORMAT);
+        $endingCampaignTimestamp = $campaignDate->getTimestamp();
 
+        $startingCampaignTime = new \DateTime('now', new \DateTimeZone(self::TIMEZONE));
+        $startingCampaignTime = $startingCampaignTime->modify(self::START_CAMPAIGN_TIME)->getTimestamp();
 
-        $startTimeAvailable = new \DateTime('now', new \DateTimeZone(self::TIMEZONE));
-        $startTimeAvailable = $startTimeAvailable->modify(self::START_CAMPAIGN_TIME)->format(self::DATE_TIME_FORMAT);
+        $endingCampaignTime = new \DateTime('now', new \DateTimeZone(self::TIMEZONE));
+        $endingCampaignTime = $endingCampaignTime->modify(self::END_CAMPAIGN_TIME)->getTimestamp();
 
-        $endTimeAvailable = new \DateTime('now', new \DateTimeZone(self::TIMEZONE));
-        $endTimeAvailable = $endTimeAvailable->modify(self::END_CAMPAIGN_TIME)->format(self::DATE_TIME_FORMAT);
+        $currentDateTimestamp = (new \DateTime('now', new \DateTimeZone(self::TIMEZONE)))->getTimestamp();
 
-        dd($startingCampaignDay, $endingCampaignDay, $startTimeAvailable, $endTimeAvailable);
-        if ($startingCampaignDay > $startTimeAvailable && $startingCampaignDay < $endTimeAvailable) {
-            return;
+        if ($currentDateTimestamp > $startingCampaignTimestamp && $currentDateTimestamp < $endingCampaignTimestamp) {
+            if ($currentDateTimestamp > $startingCampaignTime && $currentDateTimestamp < $endingCampaignTime) {
+                return;
+            }
         }
 
-        throw new CampaignNotValidException('Campaign interval hours not valid! Come back between 09:00:00 and 20:00:00! ');
+        throw new CampaignNotValidException(
+            vsprintf('Campaign date and interval hours not valid! Campaign active from %s until %s between %s and %s', [
+                $startingCampaignDay, $endingCampaignDay, self::START_CAMPAIGN_TIME, self::END_CAMPAIGN_TIME,
+            ])
+        );
     }
 
     /**
@@ -139,17 +150,19 @@ class CampaignService
          *
          */
 
-        $numberOfPrizesWonToday = 400; // check in Redis
-
-        if ($numberOfPrizesWonToday >= $this->totalNumberPrizes / self::CAMPAIGN_AVAILABILITY_DAYS) {
-            throw new CampaignNotValidException(sprintf("All the %d prizes were played today! Came back tomorrow!", $numberOfPrizesWonToday));
+        /**
+         * todo: cum stiu a 2-a zis sa numar?!? sau sa nu mai numar daca este a 2-a zi de premii
+         */
+        $numberOfPrizesWonToday = 224; // fac un count pe tabela user_prizez cu received_prize_at pe azi
+        $totalNumberOfPrizesPossible = round(num: $this->totalNumberAvailablePrizes / self::CAMPAIGN_AVAILABILITY_DAYS, mode: PHP_ROUND_HALF_DOWN);
+        if ($numberOfPrizesWonToday >= $totalNumberOfPrizesPossible) {
+            throw new CampaignNotValidException(sprintf("All the %d prizes were played today! Came back tomorrow!", $totalNumberOfPrizesPossible));
         }
     }
 
     private function getRandomPrize(): Prize
     {
-        $prizes = $this->prizeRepository->findAll();
-
+        $prizes = $this->prizeRepository->getAvailablePrizes();
         shuffle($prizes);
 
         return $prizes[0];

@@ -7,7 +7,9 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Knp\DoctrineBehaviors\Contract\Entity\TranslatableInterface;
+use Knp\DoctrineBehaviors\Contract\Entity\TranslationInterface;
 use Knp\DoctrineBehaviors\Model\Translatable\TranslatableTrait;
+use Ramsey\Uuid\Type\Integer;
 
 #[ORM\Entity(repositoryClass: PartnerRepository::class)]
 #[ORM\Table(name: 'partner')]
@@ -29,7 +31,7 @@ class Partner implements TranslatableInterface
     /**
      * @var Collection<int, Prize>
      */
-    #[ORM\OneToMany(mappedBy: 'partnerCode', targetEntity: Prize::class, orphanRemoval: true)]
+    #[ORM\OneToMany(mappedBy: 'partner', targetEntity: Prize::class, orphanRemoval: true)]
     private Collection $prizes;
 
     public function __construct()
@@ -78,7 +80,7 @@ class Partner implements TranslatableInterface
     {
         if (!$this->prizes->contains($prize)) {
             $this->prizes->add($prize);
-            $prize->setPartnerCode($this);
+            $prize->setPartner($this);
         }
 
         return $this;
@@ -87,12 +89,16 @@ class Partner implements TranslatableInterface
     public function removePrize(Prize $prize): static
     {
         if ($this->prizes->removeElement($prize)) {
-            // set the owning side to null (unless already changed)
-            if ($prize->getPartnerCode() === $this) {
-                $prize->setPartnerCode(null);
+            if ($prize->getPartner() === $this) {
+                $prize->setPartner(null);
             }
         }
 
         return $this;
+    }
+
+    public function getNameTranslated($locale = 'en'): string
+    {
+        return $this->translate($locale)->getName();
     }
 }

@@ -19,6 +19,7 @@ readonly class PartnerTransformer
         $this->partner->translate($this->locale, false)->setName($this->partnerDTO->name);
         $this->partner->setUrl($this->partnerDTO->url);
         $this->partner->setCode($this->partnerDTO->code);
+        $this->partner->setCode($this->partnerDTO->code);
 
         return $this->partner;
     }

@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\UserRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -37,6 +39,17 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Column(length: 255)]
     private ?string $lastName = null;
+
+    /**
+     * @var Collection<int, UserPrize>
+     */
+    #[ORM\OneToMany(mappedBy: 'user', targetEntity: UserPrize::class)]
+    private Collection $userPrizes;
+
+    public function __construct()
+    {
+        $this->userPrizes = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -130,5 +143,34 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     public function eraseCredentials(): void
     {
+    }
+
+    /**
+     * @return Collection<int, UserPrize>
+     */
+    public function getUserPrizes(): Collection
+    {
+        return $this->userPrizes;
+    }
+
+    public function addUserPrize(UserPrize $userPrize): static
+    {
+        if (!$this->userPrizes->contains($userPrize)) {
+            $this->userPrizes->add($userPrize);
+            $userPrize->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeUserPrize(UserPrize $userPrize): static
+    {
+        if ($this->userPrizes->removeElement($userPrize)) {
+            if ($userPrize->getUser() === $this) {
+                $userPrize->setUser(null);
+            }
+        }
+
+        return $this;
     }
 }

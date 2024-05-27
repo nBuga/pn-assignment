@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Exception\CampaignNotValidException;
 use App\Service\CampaignService;
+use Doctrine\DBAL\Exception;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -13,7 +14,6 @@ use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 class PlayController extends AbstractController
 {
     /**
-     * @throws CampaignNotValidException
      */
     #[Route('/{_locale}/play', name: 'app_play', requirements: ['_locale' => 'en|de'], methods: ["GET"])]
     public function index(
@@ -23,15 +23,22 @@ class PlayController extends AbstractController
     {
         try {
             $this->denyAccessUnlessGranted('IS_AUTHENTICATED');
+            $prize = $campaignService->play($this->getUser());
         } catch (AccessDeniedException $exception) {
-            return $this->getResponseAccessDenied($exception, 'You must be logged in to play.');
+            return $this->getResponseException($exception, 'You must be logged in to play.');
+        } catch (CampaignNotValidException $exception) {
+            return $this->getResponseException($exception);
+        } catch (Exception $exception) {
+            return $this->getResponseException($exception, 'Something was wrong.');
         }
 
-        $campaignService->play($this->getUser());
-
         $response = [
-            'total' => 121,
-            'data' => 'companies',
+            'data' => [
+                'prizeName' => $prize->translate()->getName(),
+                'prizeDescription' => $prize->translate()->getDescription(),
+                'partnerName' => $prize->getPartner()->getNameTranslated($request->getLocale()),
+                'partnerUrl' => $prize->getPartner()->getUrl(),
+            ],
         ];
 
         return $this->json($response);
@@ -42,7 +49,7 @@ class PlayController extends AbstractController
      *
      * @return JsonResponse
      */
-    #[Route('/redeem-prize', name: 'app_redeem_prize', methods: ["GET"])]
+    #[Route('/{_locale}/redeem-prize', name: 'app_redeem_prize', requirements: ['_locale' => 'en|de'], methods: ["GET"])]
     public function redeemPrize(
         CampaignService $campaignService
     ): JsonResponse
@@ -51,7 +58,7 @@ class PlayController extends AbstractController
             $this->denyAccessUnlessGranted('IS_AUTHENTICATED');
         } catch (AccessDeniedException $exception) {
             $customMessage = 'You must be logged in order to redeem your prize.';
-            return $this->getResponseAccessDenied($exception, $customMessage);
+            return $this->getResponseException($exception, $customMessage);
         }
 
 
@@ -63,7 +70,10 @@ class PlayController extends AbstractController
         return $this->json($response);
     }
 
-    private function getResponseAccessDenied(AccessDeniedException $exception, string $customMessage): JsonResponse
+    private function getResponseException(
+        AccessDeniedException|CampaignNotValidException|Exception $exception,
+        string $customMessage = ''
+    ): JsonResponse
     {
         $response = ['error' => [
             'message' => vsprintf('%s %s', [$exception->getMessage(), $customMessage])
