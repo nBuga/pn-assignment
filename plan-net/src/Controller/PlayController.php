@@ -63,6 +63,8 @@ class PlayController extends AbstractController
             return $this->getResponseException($exception, 'You must be logged in order to redeem your prize.');
         }
 
+        //dd($request->getLocale(), $prize->getPartner()->getNameTranslated($request->getLocale()));
+
         if (!$prize) {
             $response = [
                 'data' => [
@@ -72,7 +74,7 @@ class PlayController extends AbstractController
         } else {
             $response = [
                 'data' => [
-                    'prizeName' => $prize->translate()->getName(),
+                    'prizeName' => $prize->getNameTranslated($request->getLocale()),
                     'prizeDescription' => $prize->translate()->getDescription(),
                     'partnerName' => $prize->getPartner()->getNameTranslated($request->getLocale()),
                     'partnerUrl' => $prize->getPartner()->getUrl(),

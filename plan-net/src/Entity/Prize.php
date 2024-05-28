@@ -110,4 +110,9 @@ class Prize implements TranslatableInterface
 
         return $this;
     }
+
+    public function getNameTranslated($locale = 'en'): string
+    {
+        return $this->translate($locale)->getName();
+    }
 }

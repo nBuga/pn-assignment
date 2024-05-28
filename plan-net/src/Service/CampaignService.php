@@ -31,7 +31,7 @@ class CampaignService
      * DONE -no prizes are to be given from 00:00:00 to 09:00:00 and 20:00:00 to 23:59:59;
      * DONE -the user can no longer play if he won a prize already that day;
      * DONE -if the user calls the play service again an error will be shown;
-     * -the user can call a service that tells him whether he played or not and if so then the prize will be outputted;
+     * DONE -the user can call a service that tells him whether he played or not and if so then the prize will be outputted;
      * -when the prize is outputted to the user it will also contain the partner data;
      * -user will provide the language parameter to the server and server will choose appropriate language (for you to decide how to pass it);
      *
