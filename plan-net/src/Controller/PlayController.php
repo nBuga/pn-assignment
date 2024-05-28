@@ -23,6 +23,7 @@ class PlayController extends AbstractController
     {
         try {
             $this->denyAccessUnlessGranted('IS_AUTHENTICATED');
+
             $prize = $campaignService->play($this->getUser());
         } catch (AccessDeniedException $exception) {
             return $this->getResponseException($exception, 'You must be logged in to play.');
@@ -51,21 +52,33 @@ class PlayController extends AbstractController
      */
     #[Route('/{_locale}/redeem-prize', name: 'app_redeem_prize', requirements: ['_locale' => 'en|de'], methods: ["GET"])]
     public function redeemPrize(
+        Request $request,
         CampaignService $campaignService
     ): JsonResponse
     {
         try {
             $this->denyAccessUnlessGranted('IS_AUTHENTICATED');
+            $prize = $campaignService->redeemTodayPrize($this->getUser());
         } catch (AccessDeniedException $exception) {
-            $customMessage = 'You must be logged in order to redeem your prize.';
-            return $this->getResponseException($exception, $customMessage);
+            return $this->getResponseException($exception, 'You must be logged in order to redeem your prize.');
         }
 
-
-        $response = [
-            'total' => 121,
-            'data' => 'companies',
-        ];
+        if (!$prize) {
+            $response = [
+                'data' => [
+                    'message' => 'You didn\'t play today!',
+                ]
+            ];
+        } else {
+            $response = [
+                'data' => [
+                    'prizeName' => $prize->translate()->getName(),
+                    'prizeDescription' => $prize->translate()->getDescription(),
+                    'partnerName' => $prize->getPartner()->getNameTranslated($request->getLocale()),
+                    'partnerUrl' => $prize->getPartner()->getUrl(),
+                ],
+            ];
+        }
 
         return $this->json($response);
     }

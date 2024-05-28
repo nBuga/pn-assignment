@@ -5,6 +5,7 @@ namespace App\Repository;
 use App\Entity\UserPrize;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
  * @extends ServiceEntityRepository<UserPrize>
@@ -21,28 +22,27 @@ class UserPrizeRepository extends ServiceEntityRepository
         parent::__construct($registry, UserPrize::class);
     }
 
-    //    /**
-    //     * @return UserPrize[] Returns an array of UserPrize objects
-    //     */
-    //    public function findByExampleField($value): array
-    //    {
-    //        return $this->createQueryBuilder('u')
-    //            ->andWhere('u.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->orderBy('u.id', 'ASC')
-    //            ->setMaxResults(10)
-    //            ->getQuery()
-    //            ->getResult()
-    //        ;
-    //    }
+    public function findTodayPrize(UserInterface $user, \DateTime $currentDateTime): ?UserPrize
+    {
+        return $this->createQueryBuilder('up')
+            ->andWhere('up.user = :user')
+            ->andWhere('up.receivedPrizeAt LIKE :date')
+            ->setParameter('user', $user)
+            ->setParameter('date', $currentDateTime->format('Y-m-d').'%')
+            ->getQuery()
+            ->getOneOrNullResult()
+            ;
+    }
 
-    //    public function findOneBySomeField($value): ?UserPrize
-    //    {
-    //        return $this->createQueryBuilder('u')
-    //            ->andWhere('u.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->getQuery()
-    //            ->getOneOrNullResult()
-    //        ;
-    //    }
+    public function countTodayPrizes(\DateTime $currentDateTime): ?UserPrize
+    {
+        return $this->createQueryBuilder('up')
+            ->andWhere('up.user = :user')
+            ->andWhere('up.receivedPrizeAt LIKE :date')
+            ->setParameter('user', $user)
+            ->setParameter('date', $currentDateTime->format('Y-m-d').'%')
+            ->getQuery()
+            ->getOneOrNullResult()
+            ;
+    }
 }
