@@ -19,11 +19,6 @@ RUN apt-get update && apt-get install -y apache2 supervisor vim git-core curl \
     php8.2-xdebug php8.2-phar php8.2-fileinfo php8.2-gd  php8.2-iconv php8.2-intl php8.2-dom ruby-full htop screen \
     php8.2-xmlreader php8.2-xmlwriter php8.2-simplexml php8.2-tokenizer node-uglify wget mysql-client telnet
 
-# nvm, node
-RUN rm /bin/sh && ln -s /bin/bash /bin/sh
-RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash
-RUN source ~/.nvm/nvm.sh && nvm install 20.12.2 && nvm use 20.12.2
-
 # Composer
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 

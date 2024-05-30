@@ -14,7 +14,6 @@ use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 #[AsMessageHandler]
 readonly class ImportPrizeHandler
 {
-
     public function __construct(
         private EntityManagerInterface $entityManager,
         private PartnerRepository $partnerRepository,
@@ -33,7 +32,7 @@ readonly class ImportPrizeHandler
             throw new PartnerNotFoundException($prizeDTO->partner_code);
         }
 
-        $prize = $this->prizeRepository->findOneBy(['partnerCode' => $partner, 'code' => $prizeDTO->code]);
+        $prize = $this->prizeRepository->findOneBy(['partner' => $partner, 'code' => $prizeDTO->code]);
         if (!$prize) {
             $prize = new Prize();
         }

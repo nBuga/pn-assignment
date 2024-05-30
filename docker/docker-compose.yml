@@ -2,7 +2,6 @@ services:
 
 # Database localhost
   mysql:
-    build: ./image_setup/mysql
     hostname: plan-net.mysql
     container_name: plan-net.mysql
     image: mysql
@@ -23,8 +22,31 @@ services:
       image: plan-net
       links:
         - mysql
+        - redis
       volumes:
         - '${LOCAL_APPS_DIR}/:/var/www/plan-net:delegated'
       ports:
         - '${APPLICATION_IP}:80:80'
         - '${APPLICATION_IP}:8888:8888'
+
+  #memcached:
+      #container_name: plan-net.memcached"
+      #hostname: plan-net.memcached
+      #image: memcached
+      #ports:
+        #- '${APPLICATION_IP}:11211:11211'
+      #restart: on-failure:5
+
+  redis:
+      image: redis
+      container_name: plan-net.redis
+      restart: always
+      ports:
+        - '${APPLICATION_IP}:6379:6379'
+      command: redis-server --save 20 1 --loglevel warning
+      volumes:
+        - cache:/data
+
+volumes:
+    cache:
+      driver: local

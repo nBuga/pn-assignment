@@ -34,15 +34,14 @@ class UserPrizeRepository extends ServiceEntityRepository
             ;
     }
 
-    public function countTodayPrizes(\DateTime $currentDateTime): ?UserPrize
+    public function countTodayPrizes(\DateTime $currentDateTime): int
     {
         return $this->createQueryBuilder('up')
-            ->andWhere('up.user = :user')
+            ->select('COUNT(up)')
             ->andWhere('up.receivedPrizeAt LIKE :date')
-            ->setParameter('user', $user)
             ->setParameter('date', $currentDateTime->format('Y-m-d').'%')
             ->getQuery()
-            ->getOneOrNullResult()
-            ;
+            ->getSingleScalarResult();
+        ;
     }
 }

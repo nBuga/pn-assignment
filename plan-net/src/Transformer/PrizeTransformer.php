@@ -17,7 +17,7 @@ readonly class PrizeTransformer
 
     public function transform(Partner $partner): Prize
     {
-        $this->prize->setPartnerCode($partner);
+        $this->prize->setPartner($partner);
         $this->prize->setCode($this->prizeDTO->code);
         $this->prize->setStock($this->prize->getStock() + 1);
         $this->prize->translate($this->locale, false)->setName($this->prizeDTO->name);

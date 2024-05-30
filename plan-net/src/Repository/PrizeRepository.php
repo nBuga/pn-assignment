@@ -30,7 +30,7 @@ class PrizeRepository extends ServiceEntityRepository
             ->getSingleScalarResult();
     }
 
-    public function getAvailablePrizes(): array
+    public function findAvailablePrizes(): array
     {
         return $this->createQueryBuilder('p')
             ->where('p.stock > 0')
