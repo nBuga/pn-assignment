@@ -2,6 +2,7 @@
 
 namespace App\Service;
 
+use App\Cache\CampaignCache;
 use App\Entity\Prize;
 use App\Entity\UserPrize;
 use Doctrine\DBAL\Exception;
@@ -10,8 +11,10 @@ use Symfony\Component\Security\Core\User\UserInterface;
 
 readonly class PrizeService
 {
-    public function __construct(private EntityManagerInterface $entityManager)
-    {
+    public function __construct(
+        private EntityManagerInterface $entityManager,
+        private CampaignCache $campaignCache,
+    ) {
     }
 
     /**
@@ -24,7 +27,7 @@ readonly class PrizeService
             $userPrize = new UserPrize();
             $userPrize->setPrize($prize);
             $userPrize->setUser($user);
-            $userPrize->setReceivedPrizeAt(new \DateTime('now', new \DateTimeZone(CampaignService::TIMEZONE)));
+            $userPrize->setReceivedPrizeAt(CampaignService::currentDateTime());
 
             $this->entityManager->persist($userPrize);
             $this->entityManager->flush();
@@ -36,6 +39,7 @@ readonly class PrizeService
             throw $e;
         }
 
+        $this->campaignCache->updatePrizeStock(CampaignService::currentDateTime());
         return $prize;
     }
 

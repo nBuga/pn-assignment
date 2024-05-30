@@ -63,8 +63,6 @@ class PlayController extends AbstractController
             return $this->getResponseException($exception, 'You must be logged in order to redeem your prize.');
         }
 
-        //dd($request->getLocale(), $prize->getPartner()->getNameTranslated($request->getLocale()));
-
         if (!$prize) {
             $response = [
                 'data' => [

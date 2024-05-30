@@ -47,15 +47,13 @@ class CampaignService
      *
      */
 
-    public CONST CAMPAIGN_AVAILABILITY_DAYS = 2;
-    public CONST CAMPAIGN_START_DATE = '2024-05-30';
-    public CONST CAMPAIGN_START_TIME = '09:00:00';
-    public CONST CAMPAIGN_END_TIME = '20:00:00';
-    public CONST DATE_TIME_FORMAT = 'Y-m-d H:i:s';
-    public CONST TIME_FORMAT = 'H:i:s';
-    public CONST TIMEZONE = 'Europe/Bucharest';
-
-    private int $totalAvailablePrizes;
+    public const CAMPAIGN_AVAILABILITY_DAYS = 2;
+    public const CAMPAIGN_START_DATE = '2024-05-30';
+    public const CAMPAIGN_START_TIME = '09:00:00';
+    public const CAMPAIGN_END_TIME = '22:00:00';
+    public const DATE_TIME_FORMAT = 'Y-m-d H:i:s';
+    public const TIME_FORMAT = 'H:i:s';
+    public const TIMEZONE = 'Europe/Bucharest';
 
     public function __construct(
         private readonly PrizeRepository $prizeRepository,
@@ -63,15 +61,7 @@ class CampaignService
         private readonly PrizeService $prizeService,
         private readonly CampaignCache $campaignCache
     ){
-        $this->setTotalNumberOfPrizes();
-    }
-
-    /**
-     * @return void
-     */
-    private function setTotalNumberOfPrizes(): void
-    {
-        $this->totalAvailablePrizes = $this->campaignCache->countAvailablePrizes();
+        $this->campaignCache->setCampaignPrizesPerDay();
     }
 
     /**
@@ -83,8 +73,8 @@ class CampaignService
     public function play(UserInterface $user): Prize
     {
         $this->validateDateTime();
-        //$this->validateUserAlreadyPlayed($user);
         $this->validateTotalPrizeForToday();
+        $this->validateUserAlreadyPlayed($user);
 
         return $this->prizeService->saveUserPrize($user, $this->getRandomPrize());
     }
@@ -95,11 +85,10 @@ class CampaignService
      */
     private function validateDateTime(): void
     {
-        $currentDateTime = $this->currentDateTime();
+        $currentDateTime = self::currentDateTime();
         $currentTime = $currentDateTime->format(self::TIME_FORMAT);
-        $startDateTime = new \DateTime(self::CAMPAIGN_START_DATE .' '.self::CAMPAIGN_START_TIME, new \DateTimeZone(self::TIMEZONE));
-        $endDateTime = new \DateTime(self::CAMPAIGN_START_DATE .' '.self::CAMPAIGN_END_TIME, new \DateTimeZone(self::TIMEZONE));
-        $endDateTime->modify(sprintf('+%d days', self::CAMPAIGN_AVAILABILITY_DAYS - 1));
+        $startDateTime = self::startDateTime();
+        $endDateTime = self::endDateTime();
         $startTime = self::CAMPAIGN_START_TIME;
         $endTime = self::CAMPAIGN_END_TIME;
 
@@ -125,7 +114,7 @@ class CampaignService
      */
     private function validateUserAlreadyPlayed(UserInterface $user): void
     {
-        $userPrize = $this->userPrizeRepository->findTodayPrize($user, $this->currentDateTime());
+        $userPrize = $this->userPrizeRepository->findTodayPrize($user, self::currentDateTime());
 
         if ($userPrize) {
             throw new CampaignNotValidException("You already played and won a prize for today!");
@@ -138,23 +127,12 @@ class CampaignService
      */
     private function validateTotalPrizeForToday(): void
     {
-        /**
-         * check totalNumberOfPrizesForToday from Redis
-         *
-         * // countTodayPrizes -> 2000 => stiu ca in ziua de start date trebuie sa fie max 1000 de prize available! unde retin nr asta???? in cache
-         *
-         * $todayAvailablePrizes - retin in Redis - in memory // 1000 / pentru fiecare zi
-         * la fiecare validare verific sa nu treaca de 1000
-         *
-         */
+        $prizeStockForToday = $this->campaignCache->getPrizesPerDay();
+        $countTodayPrizes = $this->userPrizeRepository->countTodayPrizes(self::currentDateTime());
 
-        $prizesWonToday = $this->userPrizeRepository->countTodayPrizes($this->currentDateTime());
-
-        $todayAvailablePrizes = round(num: $this->totalAvailablePrizes / self::CAMPAIGN_AVAILABILITY_DAYS, mode: PHP_ROUND_HALF_DOWN);
-        dd($prizesWonToday, $this->totalAvailablePrizes, $todayAvailablePrizes);
-
-        if ($prizesWonToday >= $todayAvailablePrizes) {
-            throw new CampaignNotValidException(sprintf("All the %d prizes were played today!", $todayAvailablePrizes));
+        //if (!$this->campaignCache->getPrizeStockForToday(self::currentDateTime())) {
+        if ($countTodayPrizes >= $prizeStockForToday) {
+            throw new CampaignNotValidException(sprintf("All the %d prizes were played today!", $prizeStockForToday));
         }
     }
 
@@ -175,18 +153,36 @@ class CampaignService
      */
     public function redeemTodayPrize(UserInterface $user): ?Prize
     {
-        $userPrize = $this->userPrizeRepository->findTodayPrize($user, $this->currentDateTime());
+        $userPrize = $this->userPrizeRepository->findTodayPrize($user, self::currentDateTime());
 
         return $userPrize?->getPrize() ?? null;
     }
 
     /**
      * @return \DateTime
-     * @throws \Exception
      */
-    private function currentDateTime(): \DateTime
+    public static function currentDateTime(): \DateTime
     {
         return new \DateTime('now', new \DateTimeZone(self::TIMEZONE));
+    }
+
+    /**
+     * @return \DateTime
+     */
+    public static function startDateTime(): \DateTime
+    {
+        return new \DateTime(self::CAMPAIGN_START_DATE .' '.self::CAMPAIGN_START_TIME, new \DateTimeZone(self::TIMEZONE));
+    }
+
+    /**
+     * @return \DateTime
+     */
+    public static function endDateTime(): \DateTime
+    {
+        $endDateTime = new \DateTime(self::CAMPAIGN_START_DATE .' '.self::CAMPAIGN_END_TIME, new \DateTimeZone(self::TIMEZONE));
+        $endDateTime->modify(sprintf('+%d days', self::CAMPAIGN_AVAILABILITY_DAYS - 1));
+
+        return $endDateTime;
     }
 
 }
