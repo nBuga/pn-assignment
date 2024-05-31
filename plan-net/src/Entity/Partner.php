@@ -1,15 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Entity;
+
 
 use App\Repository\PartnerRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Knp\DoctrineBehaviors\Contract\Entity\TranslatableInterface;
-use Knp\DoctrineBehaviors\Contract\Entity\TranslationInterface;
 use Knp\DoctrineBehaviors\Model\Translatable\TranslatableTrait;
-use Ramsey\Uuid\Type\Integer;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: PartnerRepository::class)]
 #[ORM\Table(name: 'partner')]
@@ -22,9 +24,11 @@ class Partner implements TranslatableInterface
     #[ORM\Column]
     private ?int $id = null;
 
+    #[Groups(['show'])]
     #[ORM\Column(length: 255)]
     private ?string $url = null;
 
+    #[Groups(['show'])]
     #[ORM\Column(length: 255)]
     private ?string $code = null;
 

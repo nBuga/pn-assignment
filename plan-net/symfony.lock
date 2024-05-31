@@ -41,19 +41,6 @@
     "knplabs/doctrine-behaviors": {
         "version": "2.6.2"
     },
-    "nelmio/api-doc-bundle": {
-        "version": "4.25",
-        "recipe": {
-            "repo": "github.com/symfony/recipes-contrib",
-            "branch": "main",
-            "version": "3.0",
-            "ref": "c8e0c38e1a280ab9e37587a8fa32b251d5bc1c94"
-        },
-        "files": [
-            "config/packages/nelmio_api_doc.yaml",
-            "config/routes/nelmio_api_doc.yaml"
-        ]
-    },
     "phpunit/phpunit": {
         "version": "9.6",
         "recipe": {
@@ -78,21 +65,6 @@
         },
         "files": [
             "public/.htaccess"
-        ]
-    },
-    "symfony/asset-mapper": {
-        "version": "6.4",
-        "recipe": {
-            "repo": "github.com/symfony/recipes",
-            "branch": "main",
-            "version": "6.4",
-            "ref": "6c28c471640cc2c6e60812ebcb961c526ef8997f"
-        },
-        "files": [
-            "assets/app.js",
-            "assets/styles/app.css",
-            "config/packages/asset_mapper.yaml",
-            "importmap.php"
         ]
     },
     "symfony/console": {
@@ -248,20 +220,6 @@
             "config/routes/security.yaml"
         ]
     },
-    "symfony/stimulus-bundle": {
-        "version": "2.16",
-        "recipe": {
-            "repo": "github.com/symfony/recipes",
-            "branch": "main",
-            "version": "2.13",
-            "ref": "6acd9ff4f7fd5626d2962109bd4ebab351d43c43"
-        },
-        "files": [
-            "assets/bootstrap.js",
-            "assets/controllers.json",
-            "assets/controllers/hello_controller.js"
-        ]
-    },
     "symfony/translation": {
         "version": "6.4",
         "recipe": {
@@ -287,33 +245,6 @@
             "config/packages/twig.yaml",
             "templates/base.html.twig"
         ]
-    },
-    "symfony/uid": {
-        "version": "6.4",
-        "recipe": {
-            "repo": "github.com/symfony/recipes",
-            "branch": "main",
-            "version": "6.2",
-            "ref": "d294ad4add3e15d7eb1bae0221588ca89b38e558"
-        },
-        "files": [
-            "config/packages/uid.yaml"
-        ]
-    },
-    "symfony/ux-autocomplete": {
-        "version": "2.16",
-        "recipe": {
-            "repo": "github.com/symfony/recipes",
-            "branch": "main",
-            "version": "2.6",
-            "ref": "07d9602b7231ba355f484305d6cea58310c01741"
-        },
-        "files": [
-            "config/routes/ux_autocomplete.yaml"
-        ]
-    },
-    "symfony/ux-turbo": {
-        "version": "v2.16.0"
     },
     "symfony/validator": {
         "version": "6.4",

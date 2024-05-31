@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Command;
 
 use App\Message\ImportPartner;
@@ -19,12 +21,11 @@ use Symfony\Component\Messenger\MessageBusInterface;
 )]
 class ImportPartnersCommand extends Command
 {
-    public CONST FILE_NAME = 'partners';
+    public const FILE_NAME = 'partners';
     public function __construct(
         private readonly ImportFileHandler $importFileHandler,
         private readonly MessageBusInterface $messageBus,
-    )
-    {
+    ) {
         parent::__construct();
     }
 

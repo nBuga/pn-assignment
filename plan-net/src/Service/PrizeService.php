@@ -1,10 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Service;
 
-use App\Cache\CampaignCache;
 use App\Entity\Prize;
 use App\Entity\UserPrize;
+use App\Repository\PrizeRepository;
+use App\Repository\UserPrizeRepository;
 use Doctrine\DBAL\Exception;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -13,15 +16,14 @@ readonly class PrizeService
 {
     public function __construct(
         private EntityManagerInterface $entityManager,
-        private CampaignCache $campaignCache,
+        private PrizeRepository $prizeRepository,
+        private UserPrizeRepository $userPrizeRepository,
     ) {
     }
 
-    /**
-     * @throws Exception
-     */
-    public function saveUserPrize(UserInterface $user, Prize $prize): Prize
+    public function saveUserPrize(UserInterface $user): Prize
     {
+        $prize = $this->getRandomPrize();
         $this->entityManager->getConnection()->beginTransaction();
         try {
             $userPrize = new UserPrize();
@@ -39,7 +41,6 @@ readonly class PrizeService
             throw $e;
         }
 
-        $this->campaignCache->updatePrizeStock(CampaignService::currentDateTime());
         return $prize;
     }
 
@@ -47,5 +48,20 @@ readonly class PrizeService
     {
         $prize->setStock($prize->getStock() - 1);
         $this->entityManager->flush();
+    }
+
+    private function getRandomPrize(): Prize
+    {
+        $prizes = $this->prizeRepository->findAvailablePrizes();
+        shuffle($prizes);
+
+        return $prizes[0];
+    }
+
+    public function redeemTodayPrize(UserInterface $user): ?Prize
+    {
+        $userPrize = $this->userPrizeRepository->findTodayPrize($user, CampaignService::currentDateTime());
+
+        return $userPrize?->getPrize() ?? null;
     }
 }

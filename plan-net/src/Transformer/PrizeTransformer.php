@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Transformer;
 
 use App\Entity\Partner;
@@ -12,7 +14,7 @@ readonly class PrizeTransformer
         private Prize    $prize,
         private PrizeDTO $prizeDTO,
         private string     $locale
-    ){
+    ) {
     }
 
     public function transform(Partner $partner): Prize

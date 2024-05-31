@@ -1,3 +1,9 @@
-home:
-  title: Willkommen im Indie Games Blog
-  heading: Ehrliche Rezensionen zu Indie-Spielen seit 2010
+user:
+  already_played: Sie haben heute bereits gespielt und einen Preis gewonnen!
+  not_logged_in: Du musst angemeldet sein, um spielen zu können!
+prize:
+  played_today: Alle countPrizes Preise wurden heute gespielt!
+campaign:
+  date_or_hours_not_valid: Kampagnendatum oder Intervallstunden sind ungültig! Die Kampagne ist von startDate bis endDate zwischen startTime und endTime aktiv.
+general:
+  error: Etwas war falsch!

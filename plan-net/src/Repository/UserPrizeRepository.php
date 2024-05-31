@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Repository;
 
 use App\Entity\UserPrize;
@@ -31,7 +33,7 @@ class UserPrizeRepository extends ServiceEntityRepository
             ->setParameter('date', $currentDateTime->format('Y-m-d').'%')
             ->getQuery()
             ->getOneOrNullResult()
-            ;
+        ;
     }
 
     public function countTodayPrizes(\DateTime $currentDateTime): int
@@ -41,7 +43,7 @@ class UserPrizeRepository extends ServiceEntityRepository
             ->andWhere('up.receivedPrizeAt LIKE :date')
             ->setParameter('date', $currentDateTime->format('Y-m-d').'%')
             ->getQuery()
-            ->getSingleScalarResult();
+            ->getSingleScalarResult()
         ;
     }
 }

@@ -1,10 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Command;
 
-use App\Message\ImportPartner;
 use App\Message\ImportPrize;
-use App\Model\PartnerDTO;
 use App\Model\PrizeDTO;
 use App\Service\ImportFileHandler;
 use Symfony\Component\Console\Attribute\AsCommand;
@@ -21,12 +21,11 @@ use Symfony\Component\Messenger\MessageBusInterface;
 )]
 class ImportPrizeCommand extends Command
 {
-    public CONST FILE_NAME = 'prizes';
+    public const FILE_NAME = 'prizes';
     public function __construct(
         private readonly ImportFileHandler $importFileHandler,
         private readonly MessageBusInterface $messageBus,
-    )
-    {
+    ) {
         parent::__construct();
     }
 

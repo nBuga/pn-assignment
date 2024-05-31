@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Repository;
 
 use App\Entity\Prize;
@@ -23,17 +25,20 @@ class PrizeRepository extends ServiceEntityRepository
 
     public function countPrizes(): int
     {
-        return $this->createQueryBuilder('p')
+        return (int) $this->createQueryBuilder('p')
             ->select('SUM(p.stock)')
-            ->where('p.stock > 0')
+            ->andWhere('p.stock > 0')
             ->getQuery()
             ->getSingleScalarResult();
     }
 
+    /**
+     * @return Prize[]
+     */
     public function findAvailablePrizes(): array
     {
         return $this->createQueryBuilder('p')
-            ->where('p.stock > 0')
+            ->andWhere('p.stock > 0')
             ->getQuery()
             ->getResult();
     }
