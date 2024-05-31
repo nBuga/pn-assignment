@@ -41,7 +41,6 @@ readonly class CampaignService
         $this->validateTotalPrizeForToday();
         $this->validateUserAlreadyPlayed($user);
 
-        // todo: traducere erori
         return $this->prizeService->saveUserPrize($user);
     }
 

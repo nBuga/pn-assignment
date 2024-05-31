@@ -11,7 +11,6 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Knp\DoctrineBehaviors\Contract\Entity\TranslatableInterface;
 use Knp\DoctrineBehaviors\Model\Translatable\TranslatableTrait;
-use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: PartnerRepository::class)]
 #[ORM\Table(name: 'partner')]
@@ -24,11 +23,9 @@ class Partner implements TranslatableInterface
     #[ORM\Column]
     private ?int $id = null;
 
-    #[Groups(['show'])]
     #[ORM\Column(length: 255)]
     private ?string $url = null;
 
-    #[Groups(['show'])]
     #[ORM\Column(length: 255)]
     private ?string $code = null;
 

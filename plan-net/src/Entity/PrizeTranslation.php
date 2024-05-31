@@ -7,7 +7,6 @@ namespace App\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Knp\DoctrineBehaviors\Contract\Entity\TranslationInterface;
 use Knp\DoctrineBehaviors\Model\Translatable\TranslationTrait;
-use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity]
 #[ORM\Table(name: 'prize_translation')]
@@ -20,11 +19,9 @@ class PrizeTranslation implements TranslationInterface
     #[ORM\Column(type: 'integer')]
     protected int $id;
 
-    #[Groups(['show'])]
     #[ORM\Column(type:'string', length: 255)]
     private ?string $name = null;
 
-    #[Groups(['show'])]
     #[ORM\Column(type:'string', length: 255)]
     private ?string $description = null;
 

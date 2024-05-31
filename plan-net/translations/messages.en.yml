@@ -3,6 +3,8 @@ user:
   not_logged_in: You must be logged in to play!
 prize:
   played_today: All the countPrizes prizes were played today!
+  user_not_logged: You must be logged in order to redeem your prize!
+  user_not_played: You didn't play today!
 campaign:
   date_or_hours_not_valid: Campaign date or interval hours are not valid! The campaign is active from startDate until endDate between startTime and endTime
 general:

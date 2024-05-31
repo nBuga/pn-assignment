@@ -52,21 +52,23 @@ class PlayController extends AbstractController
     #[Route('/{_locale}/redeem-prize', name: 'app_redeem_prize', requirements: ['_locale' => 'en|de'], methods: ["GET"])]
     public function redeemPrize(
         Request         $request,
-        PrizeService $prizeService
+        PrizeService $prizeService,
+        TranslatorInterface $translator
     ): JsonResponse {
         try {
             $this->denyAccessUnlessGranted('IS_AUTHENTICATED');
+
             $prize = $prizeService->redeemTodayPrize($this->getUser());
 
             if (!$prize) {
                 $response = [
                     'data' => [
-                        'message' => 'You didn\'t play today!',
+                        'message' => $translator->trans('prize.user_not_played'),
                     ]
                 ];
             } else {
                 $response = [
-                    'data' => /*$prize*/ [
+                    'data' => [
                         'prizeName' => $prize->getNameTranslated($request->getLocale()),
                         'prizeDescription' => $prize->translate()->getDescription(),
                         'partnerName' => $prize->getPartner()->getNameTranslated($request->getLocale()),
@@ -79,7 +81,7 @@ class PlayController extends AbstractController
             return $this->json($response);
 
         } catch (AccessDeniedException $exception) {
-            return $this->getResponseException($exception, 'You must be logged in order to redeem your prize.');
+            return $this->getResponseException($exception, $translator->trans('prize.user_not_logged'));
         }
     }
 

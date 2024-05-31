@@ -10,7 +10,6 @@ use App\Repository\PartnerRepository;
 use App\Transformer\PartnerTransformer;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
-
 #[AsMessageHandler]
 readonly class ImportPartnerHandler
 {

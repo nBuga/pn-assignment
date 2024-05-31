@@ -10,7 +10,6 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Knp\DoctrineBehaviors\Contract\Entity\TranslatableInterface;
 use Knp\DoctrineBehaviors\Model\Translatable\TranslatableTrait;
-use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: PrizeRepository::class)]
 #[ORM\Table(name: 'prize')]
@@ -27,7 +26,6 @@ class Prize implements TranslatableInterface
     #[ORM\JoinColumn(nullable: false)]
     private ?Partner $partner = null;
 
-    #[Groups(['show'])]
     #[ORM\Column(length: 255)]
     private ?string $code = null;
 

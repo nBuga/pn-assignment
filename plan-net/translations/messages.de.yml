@@ -3,6 +3,8 @@ user:
   not_logged_in: Du musst angemeldet sein, um spielen zu können!
 prize:
   played_today: Alle countPrizes Preise wurden heute gespielt!
+  user_not_logged: Sie müssen angemeldet sein, um Ihren Preis einlösen zu können!
+  user_not_played: Du hast heute nicht gespielt!
 campaign:
   date_or_hours_not_valid: Kampagnendatum oder Intervallstunden sind ungültig! Die Kampagne ist von startDate bis endDate zwischen startTime und endTime aktiv.
 general:
