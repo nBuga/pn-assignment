@@ -16,7 +16,7 @@ readonly class CampaignService
 {
     public const CAMPAIGN_AVAILABILITY_DAYS = 2;
     public const CAMPAIGN_START_DATE = '2024-05-30';
-    public const CAMPAIGN_START_TIME = '08:00:00';
+    public const CAMPAIGN_START_TIME = '10:00:00';
     public const CAMPAIGN_END_TIME = '20:00:00';
     public const DATE_FORMAT = 'Y-m-d';
     public const TIME_FORMAT = 'H:i:s';

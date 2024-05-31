@@ -29,14 +29,6 @@ services:
         - '${APPLICATION_IP}:80:80'
         - '${APPLICATION_IP}:8888:8888'
 
-  #memcached:
-      #container_name: plan-net.memcached"
-      #hostname: plan-net.memcached
-      #image: memcached
-      #ports:
-        #- '${APPLICATION_IP}:11211:11211'
-      #restart: on-failure:5
-
   redis:
       image: redis
       container_name: plan-net.redis

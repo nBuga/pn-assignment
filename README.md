@@ -18,21 +18,19 @@ Requirements
 Setup instructions for Docker environment
 -----------------
 
-1. Clone project plan-net-assignment
-(e.g. `` git clone git@github.com:nBuga/plan-net-assignment.git``)
-2. cd docker 
+1. Archive the project plan-net-assignment
+2. cd docker
 3. Run ``docker-compose up --build -d``
 4. Run ``docker exec -it plan-net /bin/bash``
 5. Go to ``cd /var/www/plan-net/``
 6. RUN ``composer install``
-   1. If we have error on mysql, check if the MySQL container is still up. Otherwise, exit from the plan-net container and RUN ``docker-compose up -d`` again to up the MySQL container
-7. RUN ``bin/console doctrine:migrations:migrate``
-7. RUN ``bin/console app:import-partners en``
-7. RUN ``bin/console app:import-partners de``
-7. RUN ``bin/console app:import-prizes en``
-7. RUN ``bin/console app:import-prizes de``
-8. RUN ``bin/console doctrine:fixtures:load``
-7. RUN ``bin/console messenger:consume async``
+7. RUN ``bin/console doctrine:migrations:migrate`` in order to create the tables
+8. RUN ``bin/console app:import-partners en`` - importing the partners en CSV file
+9. RUN ``bin/console app:import-partners de`` - importing the partners de CSV file
+10. RUN ``bin/console app:import-prizes en`` - importing the prizes en CSV file
+11. RUN ``bin/console app:import-prizes de`` - importing the prizes de CSV file
+12. RUN ``bin/console doctrine:fixtures:load`` - creating the users in user table
+13. RUN ``bin/console messenger:consume async`` - running the consumer who consume the above messages
 - You can configure domain names by editing ``/etc/hosts`` on the host and putting the IP and domain names desired, such as:
 ##
 # Host Database
@@ -47,7 +45,33 @@ Setup instructions for Docker environment
 
 RUN ``sudo ifconfig lo0 alias 10.254.254.0``
 
-For the API Documentation you can see it here:
-http://local.plan-net.ro/api/doc
+Presentation
+------------
+Login Page
 
-![img.png](plan-net/public/api_documentation.png)
+The password for each user is the "demo" string concatenated with the userId. Eg: demo4. Please see plan-net/src/DataFixtures/UserFixtures.php:36
+![login page.png](plan-net/public/screenshots/login_page.png)
+
+http://local.plan-net.ro/de/redeem-prize
+![user_not_played.png](plan-net/public/screenshots/user_not_played.png)
+
+http://local.plan-net.ro/en/play
+![user_play_en.png](plan-net/public/screenshots/user_play_en.png)
+
+http://local.plan-net.ro/en/play
+![user_played_en.png](plan-net/public/screenshots/user_played_en.png)
+
+http://local.plan-net.ro/de/play (translated)
+![user_played_en.png](plan-net/public/screenshots/user_played_de.png)
+
+http://local.plan-net.ro/en/redeem-prize
+![redeem_prize_en.png](plan-net/public/screenshots/redeem_prize_en.png)
+
+http://local.plan-net.ro/de/redeem-prize (translated)
+![redeem_prize_de.png](plan-net/public/screenshots/redeem_prize_de.png)
+
+http://local.plan-net.ro/en/play (I changed the starting hour a little bit to make this screenshot)
+![campaign_date_not_valid_en](plan-net/public/screenshots/campaign_date_not_valid_en.png)
+
+http://local.plan-net.ro/de/play (translated)
+![campaign_date_not_valid_en](plan-net/public/screenshots/campaign_date_not_valid_de.png)
